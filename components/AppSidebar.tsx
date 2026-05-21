@@ -9,6 +9,7 @@ import {
   Plus,
   Check,
   LogOut,
+  CreditCard,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import {
@@ -115,6 +116,10 @@ export function AppSidebar({ teams, currentTeam, boards, profile }: AppSidebarPr
         )}
 
         <div className="mt-auto pt-2">
+          <NavItem href={`/${teamSlug}/billing`} active={pathname.startsWith(`/${teamSlug}/billing`)}>
+            <CreditCard className="h-4 w-4" />
+            Billing
+          </NavItem>
           <NavItem href={`/${teamSlug}/settings`} active={pathname.startsWith(`/${teamSlug}/settings`)}>
             <Settings className="h-4 w-4" />
             Settings

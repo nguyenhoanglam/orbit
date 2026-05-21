@@ -4,6 +4,8 @@ import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 import { createClient } from '@/lib/supabase/server'
 import { sendInviteEmail } from '@/lib/resend'
+import { canAddMember } from '@/lib/plans'
+import type { Plan } from '@/lib/plans'
 
 // ── Team settings ─────────────────────────────────────────────
 
@@ -146,6 +148,23 @@ export async function inviteMember(
     .single()
 
   if (!team) return { message: 'Team not found.' }
+
+  // Enforce plan limits
+  const { data: subscription } = await supabase
+    .from('subscriptions')
+    .select('plan')
+    .eq('team_id', teamId)
+    .single()
+
+  const plan = (subscription?.plan ?? 'lite') as Plan
+  const { count: memberCount } = await supabase
+    .from('team_members')
+    .select('id', { count: 'exact', head: true })
+    .eq('team_id', teamId)
+
+  if (!canAddMember(plan, memberCount ?? 0)) {
+    return { message: 'You have reached the member limit for the Lite plan. Upgrade to Pro for unlimited members.' }
+  }
 
   // Upsert invite (reset expiry if reinviting)
   const { data: invite, error } = await supabase

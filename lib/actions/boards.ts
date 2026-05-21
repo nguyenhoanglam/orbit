@@ -3,6 +3,8 @@
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 import { createClient } from '@/lib/supabase/server'
+import { canCreateBoard } from '@/lib/plans'
+import type { Plan } from '@/lib/plans'
 
 const BoardSchema = z.object({
   name: z.string().min(1, 'Name is required.').max(100).trim(),
@@ -57,6 +59,23 @@ export async function createBoard(
     .single()
 
   if (!team) return { message: 'Team not found.' }
+
+  // Enforce plan limits
+  const { data: subscription } = await supabase
+    .from('subscriptions')
+    .select('plan')
+    .eq('team_id', team.id)
+    .single()
+
+  const plan = (subscription?.plan ?? 'lite') as Plan
+  const { count: boardCount } = await supabase
+    .from('boards')
+    .select('id', { count: 'exact', head: true })
+    .eq('team_id', team.id)
+
+  if (!canCreateBoard(plan, boardCount ?? 0)) {
+    return { message: 'You have reached the board limit for the Lite plan. Upgrade to Pro for unlimited boards.' }
+  }
 
   // Get max position
   const { data: boards } = await supabase
