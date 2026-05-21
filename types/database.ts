@@ -1,345 +1,741 @@
-/**
- * Auto-generated Supabase database types.
- * Regenerate with: pnpm supabase gen types typescript --local > types/database.ts
- *
- * This file is a hand-written stub that mirrors the schema defined in
- * supabase/migrations/20260520000001_initial_schema.sql.
- * Replace with the auto-generated output once local Supabase is running.
- */
+export type Json =
+  | string
+  | number
+  | boolean
+  | null
+  | { [key: string]: Json | undefined }
+  | Json[]
 
-export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[]
-
-export type TeamRole = 'admin' | 'member' | 'viewer'
-export type TaskPriority = 'urgent' | 'high' | 'medium' | 'low' | 'none'
-export type SubscriptionPlan = 'lite' | 'pro'
-export type SubscriptionStatus = 'active' | 'trialing' | 'past_due' | 'canceled' | 'incomplete'
-
-export interface Database {
+export type Database = {
+  graphql_public: {
+    Tables: {
+      [_ in never]: never
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      graphql: {
+        Args: {
+          extensions?: Json
+          operationName?: string
+          query?: string
+          variables?: Json
+        }
+        Returns: Json
+      }
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
+  }
   public: {
     Tables: {
-      profiles: {
-        Row: {
-          id: string
-          email: string
-          display_name: string | null
-          avatar_url: string | null
-          created_at: string
-          updated_at: string
-        }
-        Insert: {
-          id: string
-          email: string
-          display_name?: string | null
-          avatar_url?: string | null
-          created_at?: string
-          updated_at?: string
-        }
-        Update: {
-          id?: string
-          email?: string
-          display_name?: string | null
-          avatar_url?: string | null
-          updated_at?: string
-        }
-      }
-      teams: {
-        Row: {
-          id: string
-          name: string
-          slug: string
-          logo_url: string | null
-          stripe_customer_id: string | null
-          created_by: string
-          created_at: string
-          updated_at: string
-        }
-        Insert: {
-          id?: string
-          name: string
-          slug: string
-          logo_url?: string | null
-          stripe_customer_id?: string | null
-          created_by: string
-          created_at?: string
-          updated_at?: string
-        }
-        Update: {
-          id?: string
-          name?: string
-          slug?: string
-          logo_url?: string | null
-          stripe_customer_id?: string | null
-          updated_at?: string
-        }
-      }
-      team_members: {
-        Row: {
-          id: string
-          team_id: string
-          user_id: string
-          role: TeamRole
-          created_at: string
-        }
-        Insert: {
-          id?: string
-          team_id: string
-          user_id: string
-          role?: TeamRole
-          created_at?: string
-        }
-        Update: {
-          role?: TeamRole
-        }
-      }
-      team_invites: {
-        Row: {
-          id: string
-          team_id: string
-          email: string
-          role: TeamRole
-          token: string
-          invited_by: string
-          accepted_at: string | null
-          expires_at: string
-          created_at: string
-        }
-        Insert: {
-          id?: string
-          team_id: string
-          email: string
-          role?: TeamRole
-          token?: string
-          invited_by: string
-          accepted_at?: string | null
-          expires_at?: string
-          created_at?: string
-        }
-        Update: {
-          accepted_at?: string | null
-          role?: TeamRole
-        }
-      }
-      workspaces: {
-        Row: {
-          id: string
-          team_id: string
-          name: string
-          created_at: string
-          updated_at: string
-        }
-        Insert: {
-          id?: string
-          team_id: string
-          name: string
-          created_at?: string
-          updated_at?: string
-        }
-        Update: {
-          name?: string
-          updated_at?: string
-        }
-      }
       boards: {
         Row: {
-          id: string
-          workspace_id: string
-          team_id: string
-          name: string
-          description: string | null
-          position: number
-          created_by: string
           created_at: string
+          created_by: string
+          description: string | null
+          id: string
+          name: string
+          position: number
+          team_id: string
           updated_at: string
+          workspace_id: string
         }
         Insert: {
-          id?: string
-          workspace_id: string
-          team_id: string
-          name: string
-          description?: string | null
-          position?: number
-          created_by: string
           created_at?: string
+          created_by: string
+          description?: string | null
+          id?: string
+          name: string
+          position?: number
+          team_id: string
           updated_at?: string
+          workspace_id: string
         }
         Update: {
-          name?: string
+          created_at?: string
+          created_by?: string
           description?: string | null
+          id?: string
+          name?: string
           position?: number
+          team_id?: string
           updated_at?: string
+          workspace_id?: string
         }
+        Relationships: [
+          {
+            foreignKeyName: "boards_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "boards_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "boards_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       columns: {
         Row: {
-          id: string
           board_id: string
+          created_at: string
+          id: string
           name: string
           position: number
-          created_at: string
           updated_at: string
         }
         Insert: {
-          id?: string
           board_id: string
+          created_at?: string
+          id?: string
           name: string
           position?: number
-          created_at?: string
           updated_at?: string
         }
         Update: {
+          board_id?: string
+          created_at?: string
+          id?: string
           name?: string
           position?: number
           updated_at?: string
         }
+        Relationships: [
+          {
+            foreignKeyName: "columns_board_id_fkey"
+            columns: ["board_id"]
+            isOneToOne: false
+            referencedRelation: "boards"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       labels: {
         Row: {
-          id: string
-          team_id: string
-          name: string
           color: string
           created_at: string
+          id: string
+          name: string
+          team_id: string
         }
         Insert: {
-          id?: string
-          team_id: string
-          name: string
           color?: string
           created_at?: string
+          id?: string
+          name: string
+          team_id: string
         }
         Update: {
-          name?: string
           color?: string
+          created_at?: string
+          id?: string
+          name?: string
+          team_id?: string
         }
+        Relationships: [
+          {
+            foreignKeyName: "labels_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
       }
-      tasks: {
+      profiles: {
         Row: {
-          id: string
-          board_id: string
-          column_id: string
-          team_id: string
-          title: string
-          description: string | null
-          priority: TaskPriority
-          due_date: string | null
-          position: number
-          created_by: string
+          avatar_url: string | null
           created_at: string
+          display_name: string | null
+          email: string
+          id: string
           updated_at: string
         }
         Insert: {
-          id?: string
-          board_id: string
-          column_id: string
-          team_id: string
-          title: string
-          description?: string | null
-          priority?: TaskPriority
-          due_date?: string | null
-          position?: number
-          created_by: string
+          avatar_url?: string | null
           created_at?: string
+          display_name?: string | null
+          email: string
+          id: string
           updated_at?: string
         }
         Update: {
-          column_id?: string
-          title?: string
-          description?: string | null
-          priority?: TaskPriority
-          due_date?: string | null
-          position?: number
+          avatar_url?: string | null
+          created_at?: string
+          display_name?: string | null
+          email?: string
+          id?: string
           updated_at?: string
         }
-      }
-      task_assignees: {
-        Row: {
-          task_id: string
-          user_id: string
-          created_at: string
-        }
-        Insert: {
-          task_id: string
-          user_id: string
-          created_at?: string
-        }
-        Update: Record<string, never>
-      }
-      task_labels: {
-        Row: {
-          task_id: string
-          label_id: string
-        }
-        Insert: {
-          task_id: string
-          label_id: string
-        }
-        Update: Record<string, never>
-      }
-      task_activity: {
-        Row: {
-          id: string
-          task_id: string
-          user_id: string
-          type: string
-          payload: Json
-          created_at: string
-        }
-        Insert: {
-          id?: string
-          task_id: string
-          user_id: string
-          type: string
-          payload?: Json
-          created_at?: string
-        }
-        Update: Record<string, never>
+        Relationships: []
       }
       subscriptions: {
         Row: {
-          id: string
-          team_id: string
-          plan: SubscriptionPlan
-          status: SubscriptionStatus
-          stripe_subscription_id: string | null
-          stripe_price_id: string | null
-          current_period_start: string | null
-          current_period_end: string | null
           cancel_at_period_end: boolean
           created_at: string
+          current_period_end: string | null
+          current_period_start: string | null
+          id: string
+          plan: Database["public"]["Enums"]["subscription_plan"]
+          status: Database["public"]["Enums"]["subscription_status"]
+          stripe_price_id: string | null
+          stripe_subscription_id: string | null
+          team_id: string
           updated_at: string
         }
         Insert: {
-          id?: string
-          team_id: string
-          plan?: SubscriptionPlan
-          status?: SubscriptionStatus
-          stripe_subscription_id?: string | null
-          stripe_price_id?: string | null
-          current_period_start?: string | null
-          current_period_end?: string | null
           cancel_at_period_end?: boolean
           created_at?: string
+          current_period_end?: string | null
+          current_period_start?: string | null
+          id?: string
+          plan?: Database["public"]["Enums"]["subscription_plan"]
+          status?: Database["public"]["Enums"]["subscription_status"]
+          stripe_price_id?: string | null
+          stripe_subscription_id?: string | null
+          team_id: string
           updated_at?: string
         }
         Update: {
-          plan?: SubscriptionPlan
-          status?: SubscriptionStatus
-          stripe_subscription_id?: string | null
-          stripe_price_id?: string | null
-          current_period_start?: string | null
-          current_period_end?: string | null
           cancel_at_period_end?: boolean
+          created_at?: string
+          current_period_end?: string | null
+          current_period_start?: string | null
+          id?: string
+          plan?: Database["public"]["Enums"]["subscription_plan"]
+          status?: Database["public"]["Enums"]["subscription_status"]
+          stripe_price_id?: string | null
+          stripe_subscription_id?: string | null
+          team_id?: string
           updated_at?: string
         }
+        Relationships: [
+          {
+            foreignKeyName: "subscriptions_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: true
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      task_activity: {
+        Row: {
+          created_at: string
+          id: string
+          payload: Json
+          task_id: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          payload?: Json
+          task_id: string
+          type: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          payload?: Json
+          task_id?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "task_activity_task_id_fkey"
+            columns: ["task_id"]
+            isOneToOne: false
+            referencedRelation: "tasks"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "task_activity_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      task_assignees: {
+        Row: {
+          created_at: string
+          task_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          task_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          task_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "task_assignees_task_id_fkey"
+            columns: ["task_id"]
+            isOneToOne: false
+            referencedRelation: "tasks"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "task_assignees_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      task_labels: {
+        Row: {
+          label_id: string
+          task_id: string
+        }
+        Insert: {
+          label_id: string
+          task_id: string
+        }
+        Update: {
+          label_id?: string
+          task_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "task_labels_label_id_fkey"
+            columns: ["label_id"]
+            isOneToOne: false
+            referencedRelation: "labels"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "task_labels_task_id_fkey"
+            columns: ["task_id"]
+            isOneToOne: false
+            referencedRelation: "tasks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tasks: {
+        Row: {
+          board_id: string
+          column_id: string
+          created_at: string
+          created_by: string
+          description: string | null
+          due_date: string | null
+          id: string
+          position: number
+          priority: Database["public"]["Enums"]["task_priority"]
+          team_id: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          board_id: string
+          column_id: string
+          created_at?: string
+          created_by: string
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          position?: number
+          priority?: Database["public"]["Enums"]["task_priority"]
+          team_id: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          board_id?: string
+          column_id?: string
+          created_at?: string
+          created_by?: string
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          position?: number
+          priority?: Database["public"]["Enums"]["task_priority"]
+          team_id?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tasks_board_id_fkey"
+            columns: ["board_id"]
+            isOneToOne: false
+            referencedRelation: "boards"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tasks_column_id_fkey"
+            columns: ["column_id"]
+            isOneToOne: false
+            referencedRelation: "columns"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tasks_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tasks_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      team_invites: {
+        Row: {
+          accepted_at: string | null
+          created_at: string
+          email: string
+          expires_at: string
+          id: string
+          invited_by: string
+          role: Database["public"]["Enums"]["team_role"]
+          team_id: string
+          token: string
+        }
+        Insert: {
+          accepted_at?: string | null
+          created_at?: string
+          email: string
+          expires_at?: string
+          id?: string
+          invited_by: string
+          role?: Database["public"]["Enums"]["team_role"]
+          team_id: string
+          token?: string
+        }
+        Update: {
+          accepted_at?: string | null
+          created_at?: string
+          email?: string
+          expires_at?: string
+          id?: string
+          invited_by?: string
+          role?: Database["public"]["Enums"]["team_role"]
+          team_id?: string
+          token?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "team_invites_invited_by_fkey"
+            columns: ["invited_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "team_invites_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      team_members: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["team_role"]
+          team_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["team_role"]
+          team_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["team_role"]
+          team_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "team_members_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "team_members_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      teams: {
+        Row: {
+          created_at: string
+          created_by: string
+          id: string
+          logo_url: string | null
+          name: string
+          slug: string
+          stripe_customer_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          id?: string
+          logo_url?: string | null
+          name: string
+          slug: string
+          stripe_customer_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          id?: string
+          logo_url?: string | null
+          name?: string
+          slug?: string
+          stripe_customer_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "teams_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      workspaces: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          team_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          team_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          team_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workspaces_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
-    Views: Record<string, never>
-    Functions: Record<string, never>
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      [_ in never]: never
+    }
     Enums: {
-      team_role: TeamRole
-      task_priority: TaskPriority
-      subscription_plan: SubscriptionPlan
-      subscription_status: SubscriptionStatus
+      subscription_plan: "lite" | "pro"
+      subscription_status:
+        | "active"
+        | "trialing"
+        | "past_due"
+        | "canceled"
+        | "incomplete"
+      task_priority: "urgent" | "high" | "medium" | "low" | "none"
+      team_role: "admin" | "member" | "viewer"
+    }
+    CompositeTypes: {
+      [_ in never]: never
     }
   }
 }
+
+type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">
+
+type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
+
+export type Tables<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
+    : never = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
+      Row: infer R
+    }
+    ? R
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])
+    ? (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
+        Row: infer R
+      }
+      ? R
+      : never
+    : never
+
+export type TablesInsert<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    : never = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Insert: infer I
+    }
+    ? I
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Insert: infer I
+      }
+      ? I
+      : never
+    : never
+
+export type TablesUpdate<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    : never = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Update: infer U
+    }
+    ? U
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Update: infer U
+      }
+      ? U
+      : never
+    : never
+
+export type Enums<
+  DefaultSchemaEnumNameOrOptions extends
+    | keyof DefaultSchema["Enums"]
+    | { schema: keyof DatabaseWithoutInternals },
+  EnumName extends DefaultSchemaEnumNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
+    : never = never,
+> = DefaultSchemaEnumNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
+  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
+    ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
+    : never
+
+export type CompositeTypes<
+  PublicCompositeTypeNameOrOptions extends
+    | keyof DefaultSchema["CompositeTypes"]
+    | { schema: keyof DatabaseWithoutInternals },
+  CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
+    : never = never,
+> = PublicCompositeTypeNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
+  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
+    ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
+    : never
+
+export const Constants = {
+  graphql_public: {
+    Enums: {},
+  },
+  public: {
+    Enums: {
+      subscription_plan: ["lite", "pro"],
+      subscription_status: [
+        "active",
+        "trialing",
+        "past_due",
+        "canceled",
+        "incomplete",
+      ],
+      task_priority: ["urgent", "high", "medium", "low", "none"],
+      team_role: ["admin", "member", "viewer"],
+    },
+  },
+} as const
+

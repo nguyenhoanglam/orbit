@@ -1,0 +1,41 @@
+import { type NextRequest, NextResponse } from 'next/server'
+import { updateSession } from '@/lib/supabase/middleware'
+
+const PUBLIC_PATHS = [
+  '/login',
+  '/signup',
+  '/auth/callback',
+  '/auth-error',
+]
+
+function isPublic(pathname: string) {
+  return PUBLIC_PATHS.some((p) => pathname.startsWith(p))
+}
+
+export async function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl
+  const { supabaseResponse, user } = await updateSession(request)
+
+  if (!user && !isPublic(pathname)) {
+    const loginUrl = request.nextUrl.clone()
+    loginUrl.pathname = '/login'
+    loginUrl.searchParams.set('next', pathname)
+    return NextResponse.redirect(loginUrl)
+  }
+
+  // Authenticated user hitting login/signup → redirect home
+  if (user && (pathname === '/login' || pathname === '/signup')) {
+    const homeUrl = request.nextUrl.clone()
+    homeUrl.pathname = '/'
+    homeUrl.search = ''
+    return NextResponse.redirect(homeUrl)
+  }
+
+  return supabaseResponse
+}
+
+export const config = {
+  matcher: [
+    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+  ],
+}

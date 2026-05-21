@@ -25,12 +25,19 @@ Goal: Every subsequent milestone builds on a solid, runnable base.
 
 Goal: Users can sign up, log in, create a team, and receive a welcome email.
 
-- [ ] Next.js middleware for protected routes; redirect unauthenticated users to `/login`
-- [ ] `/login` and `/signup` pages (email/password + magic link via Supabase Auth)
-- [ ] Supabase server/client helpers (`lib/supabase/server.ts`, `lib/supabase/client.ts`)
-- [ ] Multi-step onboarding wizard: profile setup → team name → invite members
-- [ ] Resend integration: send welcome email on signup (`lib/resend.ts`, email template in `emails/`)
-- [ ] Server action: create team + default workspace on onboarding completion
+- [ ] Install packages: `resend`, `zod`; add Shadcn components: `form`, `input`, `label`, `card`, `separator`
+- [ ] `middleware.ts` — session refresh + protect all routes except auth pages
+- [ ] `lib/supabase/middleware.ts` — Supabase client helper for use inside middleware
+- [ ] `app/(auth)/layout.tsx` — centred card layout for all auth pages
+- [ ] `app/(auth)/login/page.tsx` — email/password + magic link tabs, uses `lib/actions/auth.ts`
+- [ ] `app/(auth)/signup/page.tsx` — email/password signup form, uses `lib/actions/auth.ts`
+- [ ] `app/(auth)/callback/route.ts` — handles magic link and email confirmation redirects from Supabase
+- [ ] `lib/actions/auth.ts` — server actions: `login`, `signup`, `loginWithMagicLink`, `logout`; validated with Zod
+- [ ] `app/onboarding/page.tsx` — 3-step wizard: (1) display name, (2) team name + slug, (3) optional invites
+- [ ] `lib/actions/onboarding.ts` — server action: create team + workspace + set admin role + Lite subscription row
+- [ ] `lib/resend.ts` — Resend SDK singleton (no-op when `RESEND_API_KEY` is absent for local dev)
+- [ ] `emails/WelcomeEmail.tsx` — React Email welcome template
+- [ ] `app/page.tsx` — smart redirect: authenticated+team → `/(app)/[slug]`; authenticated no team → `/onboarding`; guest → `/login`
 
 ---
 
