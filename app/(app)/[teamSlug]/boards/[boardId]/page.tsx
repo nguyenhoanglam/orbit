@@ -1,7 +1,9 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { KanbanBoard } from '@/components/KanbanBoard'
+import { getLimits } from '@/lib/plans'
 import type { KanbanColumn, KanbanTask, KanbanMember, KanbanLabel } from '@/components/KanbanBoard'
+import type { Plan } from '@/lib/plans'
 
 interface Props {
   params: Promise<{ teamSlug: string; boardId: string }>
@@ -20,7 +22,7 @@ export default async function BoardPage({ params }: Props) {
 
   if (!board) redirect(`/${teamSlug}`)
 
-  const [columnsResult, membersRes, labelsRes] = await Promise.all([
+  const [columnsResult, membersRes, labelsRes, subscriptionRes] = await Promise.all([
     supabase
       .from('columns')
       .select(`
@@ -41,6 +43,7 @@ export default async function BoardPage({ params }: Props) {
       .eq('team_id', board.team_id),
 
     supabase.from('labels').select('id, name, color').eq('team_id', board.team_id),
+    supabase.from('subscriptions').select('plan').eq('team_id', board.team_id).single(),
   ])
 
   const rawColumns = (columnsResult.data ?? []) as unknown as Array<{
@@ -58,6 +61,8 @@ export default async function BoardPage({ params }: Props) {
 
   const members = (membersRes.data ?? []) as unknown as KanbanMember[]
   const teamLabels = (labelsRes.data ?? []) as KanbanLabel[]
+  const plan = (subscriptionRes.data?.plan ?? 'lite') as Plan
+  const aiEnabled = getLimits(plan).aiEnabled
 
   return (
     <div className="flex flex-1 flex-col overflow-hidden">
@@ -78,6 +83,7 @@ export default async function BoardPage({ params }: Props) {
           boardPath={boardPath}
           members={members}
           teamLabels={teamLabels}
+          aiEnabled={aiEnabled}
         />
       </div>
     </div>

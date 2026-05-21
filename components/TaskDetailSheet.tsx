@@ -1,7 +1,8 @@
 'use client'
 
-import { useState, useActionState, useEffect, startTransition } from 'react'
-import { X, Trash2, Flag, Calendar, User, Tag } from 'lucide-react'
+import { useState, useActionState, useEffect, startTransition, useCallback } from 'react'
+import { X, Trash2, Flag, Calendar, User, Tag, Sparkles, Wand2, Loader2 } from 'lucide-react'
+import { useCompletion } from '@ai-sdk/react'
 import { Sheet, SheetContent, SheetHeader } from '@/components/ui/sheet'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -43,6 +44,8 @@ interface TaskDetailSheetProps {
   members: KanbanMember[]
   teamLabels: KanbanLabel[]
   boardPath: string
+  teamId: string
+  aiEnabled?: boolean
   onClose: () => void
   onUpdate: (task: KanbanTask) => void
   onDelete: (taskId: string) => void
@@ -53,6 +56,8 @@ export function TaskDetailSheet({
   members,
   teamLabels,
   boardPath,
+  teamId,
+  aiEnabled = false,
   onClose,
   onUpdate,
   onDelete,
@@ -61,6 +66,41 @@ export function TaskDetailSheet({
   const [titleValue, setTitleValue] = useState(task.title)
   const [descValue, setDescValue] = useState(task.description ?? '')
   const [editingDesc, setEditingDesc] = useState(false)
+  const [breakdownTasks, setBreakdownTasks] = useState<{ title: string; description?: string }[]>([])
+  const [loadingBreakdown, setLoadingBreakdown] = useState(false)
+
+  const { complete: generateDesc, isLoading: generatingDesc } = useCompletion({
+    api: '/api/ai/generate-description',
+    body: { teamId },
+    streamProtocol: 'text',
+    onFinish: (_prompt, completion) => {
+      setDescValue(completion)
+      setEditingDesc(true)
+    },
+  })
+
+  const handleGenerateDesc = useCallback(() => {
+    generateDesc(task.title)
+  }, [generateDesc, task.title])
+
+  const handleBreakdown = useCallback(async () => {
+    setLoadingBreakdown(true)
+    setBreakdownTasks([])
+    try {
+      const res = await fetch('/api/ai/breakdown', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title: task.title, description: task.description, teamId }),
+      })
+      if (!res.ok) throw new Error(await res.text())
+      const data = await res.json() as { subtasks: { title: string; description?: string }[] }
+      setBreakdownTasks(data.subtasks ?? [])
+    } catch {
+      // silently fail
+    } finally {
+      setLoadingBreakdown(false)
+    }
+  }, [task.title, task.description, teamId])
 
   const [updateState, updateAction, updatePending] = useActionState<TaskState, FormData>(
     updateTask,
@@ -377,7 +417,25 @@ export function TaskDetailSheet({
 
           {/* Description */}
           <div>
-            <div className="mb-1.5 text-xs font-medium text-muted-foreground">Description</div>
+            <div className="mb-1.5 flex items-center justify-between">
+              <span className="text-xs font-medium text-muted-foreground">Description</span>
+              {aiEnabled && !editingDesc && (
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="h-6 gap-1 px-2 text-xs text-purple-500 hover:text-purple-600"
+                  onClick={handleGenerateDesc}
+                  disabled={generatingDesc}
+                >
+                  {generatingDesc ? (
+                    <Loader2 className="h-3 w-3 animate-spin" />
+                  ) : (
+                    <Sparkles className="h-3 w-3" />
+                  )}
+                  AI write
+                </Button>
+              )}
+            </div>
             {editingDesc ? (
               <div className="space-y-2">
                 <Textarea
@@ -423,6 +481,41 @@ export function TaskDetailSheet({
               </div>
             )}
           </div>
+
+          {/* AI Task Breakdown */}
+          {aiEnabled && (
+            <div>
+              <div className="mb-1.5 flex items-center justify-between">
+                <span className="text-xs font-medium text-muted-foreground">AI Breakdown</span>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="h-6 gap-1 px-2 text-xs text-purple-500 hover:text-purple-600"
+                  onClick={handleBreakdown}
+                  disabled={loadingBreakdown}
+                >
+                  {loadingBreakdown ? (
+                    <Loader2 className="h-3 w-3 animate-spin" />
+                  ) : (
+                    <Wand2 className="h-3 w-3" />
+                  )}
+                  Break into subtasks
+                </Button>
+              </div>
+              {breakdownTasks.length > 0 && (
+                <ul className="space-y-1.5 rounded-md border border-border p-2">
+                  {breakdownTasks.map((t, i) => (
+                    <li key={i} className="text-sm">
+                      <span className="font-medium">{t.title}</span>
+                      {t.description && (
+                        <p className="text-xs text-muted-foreground">{t.description}</p>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          )}
 
           {/* Meta */}
           <div className="text-xs text-muted-foreground border-t border-border pt-3">

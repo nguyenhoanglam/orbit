@@ -79,6 +79,7 @@ interface KanbanBoardProps {
   boardPath: string
   members: KanbanMember[]
   teamLabels: KanbanLabel[]
+  aiEnabled?: boolean
 }
 
 export function KanbanBoard({
@@ -89,6 +90,7 @@ export function KanbanBoard({
   boardPath,
   members,
   teamLabels,
+  aiEnabled = false,
 }: KanbanBoardProps) {
   const [columns, setColumns] = useState(initialColumns)
   const [activeItem, setActiveItem] = useState<
@@ -375,6 +377,8 @@ export function KanbanBoard({
           members={members}
           teamLabels={teamLabels}
           boardPath={boardPath}
+          teamId={teamId}
+          aiEnabled={aiEnabled}
           onClose={() => setSelectedTask(null)}
           onUpdate={handleTaskUpdate}
           onDelete={handleTaskDelete}
