@@ -71,7 +71,7 @@ export interface KanbanColumn {
   tasks: KanbanTask[]
 }
 
-interface KanbanBoardProps {
+export interface KanbanBoardProps {
   initialColumns: KanbanColumn[]
   boardId: string
   teamId: string
