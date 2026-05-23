@@ -1,9 +1,16 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import { KanbanBoard } from '@/components/KanbanBoard'
+import dynamic from 'next/dynamic'
 import { getLimits } from '@/lib/plans'
 import type { KanbanColumn, KanbanTask, KanbanMember, KanbanLabel } from '@/components/KanbanBoard'
 import type { Plan } from '@/lib/plans'
+
+// dnd-kit generates aria IDs via a counter that differs between SSR and client,
+// causing hydration mismatches. Load the board only on the client.
+const KanbanBoard = dynamic(
+  () => import('@/components/KanbanBoard').then((m) => m.KanbanBoard),
+  { ssr: false }
+)
 
 interface Props {
   params: Promise<{ teamSlug: string; boardId: string }>
