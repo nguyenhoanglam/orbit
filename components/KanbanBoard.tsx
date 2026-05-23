@@ -311,6 +311,7 @@ export function KanbanBoard({
             <form action={addColAction} className="w-72 shrink-0">
               <input type="hidden" name="boardId" value={boardId} />
               <input type="hidden" name="boardPath" value={boardPath} />
+              <input type="hidden" name="teamSlug" value={teamSlug} />
               <div className="flex items-center gap-1.5 rounded-xl border border-primary bg-muted/50 px-3 py-2.5">
                 <Input
                   ref={addColRef}
