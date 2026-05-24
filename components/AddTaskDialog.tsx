@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogHeader,
   DialogTitle,
@@ -16,7 +17,6 @@ import {
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
 } from '@/components/ui/select'
 import { createTask, type TaskState } from '@/lib/actions/tasks'
 import type { KanbanColumn } from '@/components/KanbanBoard'
@@ -57,6 +57,8 @@ export function AddTaskDialog({
 
   if (columns.length === 0) return null
 
+  const selectedColumnName = columns.find((c) => c.id === columnId)?.name ?? 'Select column'
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger
@@ -91,7 +93,7 @@ export function AddTaskDialog({
 
           <Select value={columnId} onValueChange={(v) => v && setColumnId(v)}>
             <SelectTrigger>
-              <SelectValue placeholder="Select column" />
+              <span>{selectedColumnName}</span>
             </SelectTrigger>
             <SelectContent>
               {columns.map((col) => (
@@ -107,9 +109,9 @@ export function AddTaskDialog({
           )}
 
           <div className="flex justify-end gap-2">
-            <Button type="button" variant="ghost" size="sm" onClick={() => setOpen(false)}>
+            <DialogClose render={<Button type="button" variant="ghost" size="sm" />}>
               Cancel
-            </Button>
+            </DialogClose>
             <Button type="submit" size="sm" disabled={pending}>
               Add task
             </Button>
