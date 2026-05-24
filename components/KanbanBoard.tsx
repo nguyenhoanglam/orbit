@@ -202,18 +202,12 @@ export function KanbanBoard({
       const overId = over.id as string
       if (activeId === overId) return
 
-      setColumns((cols) => {
-        const oldIndex = cols.findIndex((c) => c.id === activeId)
-        const newIndex = cols.findIndex((c) => c.id === overId)
-        const reordered = arrayMove(cols, oldIndex, newIndex)
-        // Call server action
-        reorderColumns(
-          boardId,
-          reordered.map((c) => c.id),
-          boardPath
-        )
-        return reordered
-      })
+      // Compute new order first, then fire server action outside updater
+      const oldIndex = columns.findIndex((c) => c.id === activeId)
+      const newIndex = columns.findIndex((c) => c.id === overId)
+      const reorderedCols = arrayMove(columns, oldIndex, newIndex)
+      setColumns(reorderedCols)
+      reorderColumns(boardId, reorderedCols.map((c) => c.id), boardPath)
     } else if (activeType === 'task') {
       const activeId = active.id as string
       const overId = over.id as string
@@ -226,37 +220,28 @@ export function KanbanBoard({
 
       if (!activeColumnId || !overColumnId) return
 
-      setColumns((cols) => {
-        const activeColIndex = cols.findIndex((c) => c.id === activeColumnId)
-        const overColIndex = cols.findIndex((c) => c.id === overColumnId)
+      if (activeColumnId === overColumnId) {
+        // Reorder within same column — compute outside updater
+        const activeColIndex = columns.findIndex((c) => c.id === activeColumnId)
+        const col = columns[activeColIndex]
+        const oldIndex = col.tasks.findIndex((t) => t.id === activeId)
+        const newIndex = overType === 'column'
+          ? col.tasks.length - 1
+          : col.tasks.findIndex((t) => t.id === overId)
+        if (oldIndex === newIndex) return
 
-        if (activeColumnId === overColumnId) {
-          // Reorder within same column
-          const col = cols[activeColIndex]
-          const oldIndex = col.tasks.findIndex((t) => t.id === activeId)
-          const newIndex = overType === 'column'
-            ? col.tasks.length - 1
-            : col.tasks.findIndex((t) => t.id === overId)
-          if (oldIndex === newIndex) return cols
-
-          const reordered = arrayMove(col.tasks, oldIndex, newIndex)
-          reorderTasksInColumn(
-            activeColumnId,
-            reordered.map((t) => t.id),
-            boardPath
-          )
-
-          const newCols = [...cols]
-          newCols[activeColIndex] = { ...col, tasks: reordered }
-          return newCols
-        } else {
-          // Move to different column (state already updated in onDragOver)
-          const targetCol = cols[overColIndex]
-          const taskIndex = targetCol.tasks.findIndex((t) => t.id === activeId)
-          moveTask(activeId, overColumnId, taskIndex, boardPath)
-          return cols
-        }
-      })
+        const reordered = arrayMove(col.tasks, oldIndex, newIndex)
+        const newCols = [...columns]
+        newCols[activeColIndex] = { ...col, tasks: reordered }
+        setColumns(newCols)
+        reorderTasksInColumn(activeColumnId, reordered.map((t) => t.id), boardPath)
+      } else {
+        // Move to different column — state already updated in onDragOver
+        const overColIndex = columns.findIndex((c) => c.id === overColumnId)
+        const targetCol = columns[overColIndex]
+        const taskIndex = targetCol.tasks.findIndex((t) => t.id === activeId)
+        moveTask(activeId, overColumnId, taskIndex, boardPath)
+      }
     }
   }
 
