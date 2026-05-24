@@ -333,10 +333,10 @@ export function TaskDetailSheet({
                 </button>
               ))}
               <DropdownMenu>
-                <DropdownMenuTrigger>
-                  <button className="flex items-center gap-1 rounded-full border border-dashed border-border px-2 py-0.5 text-xs text-muted-foreground hover:border-primary hover:text-primary transition-colors">
-                    + Assign
-                  </button>
+                <DropdownMenuTrigger
+                  className="flex items-center gap-1 rounded-full border border-dashed border-border px-2 py-0.5 text-xs text-muted-foreground hover:border-primary hover:text-primary transition-colors"
+                >
+                  + Assign
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
                   {members.map((m) => {
@@ -388,10 +388,10 @@ export function TaskDetailSheet({
               )}
               {teamLabels.length > 0 && (
                 <DropdownMenu>
-                  <DropdownMenuTrigger>
-                    <button className="flex items-center gap-1 rounded-full border border-dashed border-border px-2 py-0.5 text-xs text-muted-foreground hover:border-primary hover:text-primary transition-colors">
-                      + Label
-                    </button>
+                  <DropdownMenuTrigger
+                    className="flex items-center gap-1 rounded-full border border-dashed border-border px-2 py-0.5 text-xs text-muted-foreground hover:border-primary hover:text-primary transition-colors"
+                  >
+                    + Label
                   </DropdownMenuTrigger>
                   <DropdownMenuContent>
                     {teamLabels.map((label) => {
