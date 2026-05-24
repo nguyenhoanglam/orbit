@@ -6,7 +6,6 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
   Dialog,
-  DialogClose,
   DialogContent,
   DialogHeader,
   DialogTitle,
@@ -20,6 +19,8 @@ import {
 } from '@/components/ui/select'
 import { createTask, type TaskState } from '@/lib/actions/tasks'
 import type { KanbanColumn } from '@/components/KanbanBoard'
+
+const INITIAL_STATE: TaskState = {}
 
 interface AddTaskDialogProps {
   columns: KanbanColumn[]
@@ -39,18 +40,25 @@ export function AddTaskDialog({
   const [open, setOpen] = useState(false)
   const [columnId, setColumnId] = useState(defaultColumnId ?? columns[0]?.id ?? '')
   const titleRef = useRef<HTMLInputElement>(null)
+  const formRef = useRef<HTMLFormElement>(null)
 
-  const [state, action, pending] = useActionState<TaskState, FormData>(createTask, {})
+  const [state, action, pending] = useActionState<TaskState, FormData>(createTask, INITIAL_STATE)
 
+  // Only close after a successful submission (state changed from initial and has no errors)
+  const prevStateRef = useRef<TaskState>(INITIAL_STATE)
   useEffect(() => {
-    if (!state.errors && !state.message && !pending && open) {
-      setOpen(false)
+    if (state !== prevStateRef.current) {
+      prevStateRef.current = state
+      if (!state.errors && !state.message) {
+        setOpen(false)
+      }
     }
-  }, [state, pending, open])
+  }, [state])
 
   useEffect(() => {
     if (open) {
       setColumnId(defaultColumnId ?? columns[0]?.id ?? '')
+      formRef.current?.reset()
       setTimeout(() => titleRef.current?.focus(), 50)
     }
   }, [open, defaultColumnId, columns])
@@ -73,7 +81,7 @@ export function AddTaskDialog({
         <DialogHeader>
           <DialogTitle>Add task</DialogTitle>
         </DialogHeader>
-        <form action={action} className="flex flex-col gap-4 pt-1">
+        <form ref={formRef} action={action} className="flex flex-col gap-4 pt-1">
           <input type="hidden" name="boardId" value={boardId} />
           <input type="hidden" name="teamId" value={teamId} />
           <input type="hidden" name="boardPath" value={boardPath} />
@@ -109,9 +117,9 @@ export function AddTaskDialog({
           )}
 
           <div className="flex justify-end gap-2">
-            <DialogClose render={<Button type="button" variant="ghost" size="sm" />}>
+            <Button type="button" variant="ghost" size="sm" onClick={() => setOpen(false)}>
               Cancel
-            </DialogClose>
+            </Button>
             <Button type="submit" size="sm" disabled={pending}>
               Add task
             </Button>
