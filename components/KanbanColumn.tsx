@@ -3,7 +3,7 @@
 import { useState, useActionState, useEffect, useRef } from 'react'
 import { SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import { GripVertical, Plus, MoreHorizontal, Trash2, Check, X } from 'lucide-react'
+import { GripVertical, MoreHorizontal, Trash2, Check, X } from 'lucide-react'
 import { KanbanCard } from '@/components/KanbanCard'
 import {
   DropdownMenu,
@@ -15,7 +15,6 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { cn } from '@/lib/utils'
 import { deleteColumn, updateColumn, type ColState } from '@/lib/actions/columns'
-import { createTask, type TaskState } from '@/lib/actions/tasks'
 import type { KanbanTask, KanbanColumn as KanbanColumnType } from '@/components/KanbanBoard'
 
 interface KanbanColumnProps {
@@ -36,9 +35,7 @@ export function KanbanColumn({
   onTaskClick,
 }: KanbanColumnProps) {
   const [renaming, setRenaming] = useState(false)
-  const [addingTask, setAddingTask] = useState(false)
   const renameRef = useRef<HTMLInputElement>(null)
-  const addRef = useRef<HTMLInputElement>(null)
 
   const {
     attributes,
@@ -56,7 +53,6 @@ export function KanbanColumn({
     updateColumn,
     {}
   )
-  const [addState, addAction, addPending] = useActionState<TaskState, FormData>(createTask, {})
 
   useEffect(() => {
     if (!renameState.errors && !renameState.message && !renamePending) {
@@ -65,19 +61,8 @@ export function KanbanColumn({
   }, [renameState, renamePending])
 
   useEffect(() => {
-    if (!addState.errors && !addState.message && !addPending) {
-      setAddingTask(false)
-      if (addRef.current) addRef.current.value = ''
-    }
-  }, [addState, addPending])
-
-  useEffect(() => {
     if (renaming) renameRef.current?.focus()
   }, [renaming])
-
-  useEffect(() => {
-    if (addingTask) addRef.current?.focus()
-  }, [addingTask])
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -168,50 +153,6 @@ export function KanbanColumn({
             <KanbanCard key={task.id} task={task} onClick={() => onTaskClick(task)} />
           ))}
         </SortableContext>
-
-        {/* Add task inline form */}
-        {addingTask ? (
-          <form action={addAction} className="mx-3">
-            <input type="hidden" name="columnId" value={column.id} />
-            <input type="hidden" name="boardId" value={boardId} />
-            <input type="hidden" name="teamId" value={teamId} />
-            <input type="hidden" name="boardPath" value={boardPath} />
-            <Input
-              ref={addRef}
-              name="title"
-              placeholder="Task title..."
-              className="h-8 text-sm"
-              onKeyDown={(e) => {
-                if (e.key === 'Escape') setAddingTask(false)
-              }}
-            />
-            {addState.errors?.title && (
-              <p className="text-xs text-destructive mt-1">{addState.errors.title[0]}</p>
-            )}
-            <div className="mt-1.5 flex gap-1.5">
-              <Button type="submit" size="sm" disabled={addPending} className="h-7 text-xs">
-                Add
-              </Button>
-              <Button
-                type="button"
-                size="sm"
-                variant="ghost"
-                className="h-7 text-xs"
-                onClick={() => setAddingTask(false)}
-              >
-                Cancel
-              </Button>
-            </div>
-          </form>
-        ) : (
-          <button
-            onClick={() => setAddingTask(true)}
-            className="mx-3 flex items-center gap-1.5 rounded-md px-2 py-1.5 text-xs text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
-          >
-            <Plus className="h-3.5 w-3.5" />
-            Add task
-          </button>
-        )}
       </div>
     </div>
   )

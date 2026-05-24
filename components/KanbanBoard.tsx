@@ -18,6 +18,7 @@ import { Plus, Check, X } from 'lucide-react'
 import { KanbanColumn } from '@/components/KanbanColumn'
 import { KanbanCard } from '@/components/KanbanCard'
 import { TaskDetailSheet } from '@/components/TaskDetailSheet'
+import { AddTaskDialog } from '@/components/AddTaskDialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { reorderColumns } from '@/lib/actions/columns'
@@ -288,7 +289,18 @@ export function KanbanBoard({
         onDragOver={onDragOver}
         onDragEnd={onDragEnd}
       >
-        <div className="flex h-full items-start gap-3 overflow-x-auto p-4">
+        <div className="flex flex-col h-full overflow-hidden">
+          {/* Toolbar */}
+          <div className="flex items-center gap-2 border-b border-border px-4 py-2">
+            <AddTaskDialog
+              columns={columns}
+              boardId={boardId}
+              teamId={teamId}
+              boardPath={boardPath}
+            />
+          </div>
+
+          <div className="flex flex-1 items-start gap-3 overflow-x-auto p-4">
           <SortableContext
             items={columns.map((c) => c.id)}
             strategy={horizontalListSortingStrategy}
@@ -370,6 +382,7 @@ export function KanbanBoard({
             </DragOverlay>,
             document.body
           )}
+        </div>{/* end flex flex-col */}
       </DndContext>
 
       {selectedTask && (
