@@ -233,10 +233,12 @@ export function TaskDetailSheet({
           </div>
           <div className="flex items-center gap-1">
             <AlertDialog>
-              <AlertDialogTrigger>
-                <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-destructive">
-                  <Trash2 className="h-4 w-4" />
-                </Button>
+              <AlertDialogTrigger
+                render={
+                  <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-destructive" />
+                }
+              >
+                <Trash2 className="h-4 w-4" />
               </AlertDialogTrigger>
               <AlertDialogContent>
                 <AlertDialogHeader>
