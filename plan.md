@@ -87,3 +87,21 @@ Goal: AI-assisted productivity (Pro plan only) using Vercel AI SDK.
 - [x] AI-generated task description from a short title prompt (streaming text)
 - [x] AI task breakdown: split an epic into sub-tasks
 - [ ] AI-powered search across boards and tasks
+
+---
+
+## Milestone 7 — Landing Page & Pricing
+
+Goal: Public-facing marketing presence with a striking dark landing page, reusable pricing section, and a dedicated pricing page.
+
+- [x] `app/(marketing)/layout.tsx` — minimal marketing layout wrapping nav + footer; no app sidebar
+- [x] `app/(marketing)/page.tsx` — full landing page (redirects authenticated users to their team; shows landing to guests)
+- [x] `app/(marketing)/pricing/page.tsx` — public `/pricing` page with comparison table and FAQ
+- [x] `components/marketing/MarketingNav.tsx` — sticky nav with logo, links, Login + Start Free CTAs
+- [x] `components/marketing/HeroSection.tsx` — bold gradient headline, glow orbs, two CTAs, social proof
+- [x] `components/marketing/ScreenshotSection.tsx` — browser-chrome frame around dashboard screenshot
+- [x] `components/marketing/FeaturesSection.tsx` — 6-card feature grid with hover accents
+- [x] `components/marketing/PricingSection.tsx` — reusable Lite/Pro cards (reads `lib/plans.ts`)
+- [x] `components/marketing/FooterSection.tsx` — logo, links grid, copyright
+- [ ] Dashboard screenshot captured via Playwright → `public/screenshots/dashboard.png`
+- [ ] Playwright visual validation: dark bg, hero, pricing cards, no overflow

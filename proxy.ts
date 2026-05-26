@@ -2,11 +2,14 @@ import { type NextRequest, NextResponse } from 'next/server'
 import { updateSession } from '@/lib/supabase/middleware'
 
 const PUBLIC_PATHS = [
+  '/',
+  '/pricing',
   '/login',
   '/signup',
   '/auth/callback',
   '/auth-error',
   '/invite',
+  '/api',
 ]
 
 function isPublic(pathname: string) {
