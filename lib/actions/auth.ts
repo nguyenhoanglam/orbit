@@ -41,14 +41,23 @@ export async function login(
     return { errors: parsed.error.flatten().fieldErrors }
   }
 
+  const nextParam = formData.get('next')
+  const next =
+    typeof nextParam === 'string' && nextParam.startsWith('/')
+      ? nextParam
+      : '/'
+
   const supabase = await createClient()
-  const { error } = await supabase.auth.signInWithPassword(parsed.data)
+  const { error } = await supabase.auth.signInWithPassword({
+    email: parsed.data.email,
+    password: parsed.data.password,
+  })
 
   if (error) {
     return { message: error.message }
   }
 
-  redirect('/')
+  redirect(next)
 }
 
 export async function signup(
@@ -65,6 +74,12 @@ export async function signup(
     return { errors: parsed.error.flatten().fieldErrors }
   }
 
+  const nextParam = formData.get('next')
+  const next =
+    typeof nextParam === 'string' && nextParam.startsWith('/')
+      ? nextParam
+      : '/onboarding'
+
   const supabase = await createClient()
   const { error } = await supabase.auth.signUp({
     email: parsed.data.email,
@@ -78,7 +93,7 @@ export async function signup(
     return { message: error.message }
   }
 
-  redirect('/onboarding')
+  redirect(next)
 }
 
 export async function loginWithMagicLink(
