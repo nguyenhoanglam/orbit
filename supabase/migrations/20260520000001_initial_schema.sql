@@ -26,7 +26,7 @@ create policy "Users can update own profile"
 -- TEAMS
 -- ============================================================
 create table public.teams (
-  id               uuid primary key default uuid_generate_v4(),
+  id               uuid primary key default gen_random_uuid(),
   name             text not null,
   slug             text not null unique,
   logo_url         text,
@@ -44,7 +44,7 @@ alter table public.teams enable row level security;
 create type public.team_role as enum ('admin', 'member', 'viewer');
 
 create table public.team_members (
-  id         uuid primary key default uuid_generate_v4(),
+  id         uuid primary key default gen_random_uuid(),
   team_id    uuid not null references public.teams(id) on delete cascade,
   user_id    uuid not null references public.profiles(id) on delete cascade,
   role       public.team_role not null default 'member',
@@ -88,11 +88,11 @@ create policy "Team admins can update team"
 -- TEAM INVITES
 -- ============================================================
 create table public.team_invites (
-  id         uuid primary key default uuid_generate_v4(),
+  id         uuid primary key default gen_random_uuid(),
   team_id    uuid not null references public.teams(id) on delete cascade,
   email      text not null,
   role       public.team_role not null default 'member',
-  token      text not null unique default encode(gen_random_bytes(32), 'hex'),
+  token      text not null unique default encode(extensions.gen_random_bytes(32), 'hex'),
   invited_by uuid not null references public.profiles(id) on delete restrict,
   accepted_at timestamptz,
   expires_at timestamptz not null default (now() + interval '7 days'),
@@ -115,7 +115,7 @@ create policy "Team admins can manage invites"
 -- WORKSPACES
 -- ============================================================
 create table public.workspaces (
-  id         uuid primary key default uuid_generate_v4(),
+  id         uuid primary key default gen_random_uuid(),
   team_id    uuid not null references public.teams(id) on delete cascade,
   name       text not null,
   created_at timestamptz not null default now(),
@@ -148,7 +148,7 @@ create policy "Team admins/members can manage workspaces"
 -- BOARDS
 -- ============================================================
 create table public.boards (
-  id           uuid primary key default uuid_generate_v4(),
+  id           uuid primary key default gen_random_uuid(),
   workspace_id uuid not null references public.workspaces(id) on delete cascade,
   team_id      uuid not null references public.teams(id) on delete cascade,
   name         text not null,
@@ -185,7 +185,7 @@ create policy "Team admins/members can manage boards"
 -- COLUMNS (board swimlanes)
 -- ============================================================
 create table public.columns (
-  id         uuid primary key default uuid_generate_v4(),
+  id         uuid primary key default gen_random_uuid(),
   board_id   uuid not null references public.boards(id) on delete cascade,
   name       text not null,
   position   integer not null default 0,
@@ -221,7 +221,7 @@ create policy "Team admins/members can manage columns"
 -- LABELS
 -- ============================================================
 create table public.labels (
-  id         uuid primary key default uuid_generate_v4(),
+  id         uuid primary key default gen_random_uuid(),
   team_id    uuid not null references public.teams(id) on delete cascade,
   name       text not null,
   color      text not null default '#6366f1',
@@ -256,7 +256,7 @@ create policy "Team admins/members can manage labels"
 create type public.task_priority as enum ('urgent', 'high', 'medium', 'low', 'none');
 
 create table public.tasks (
-  id          uuid primary key default uuid_generate_v4(),
+  id          uuid primary key default gen_random_uuid(),
   board_id    uuid not null references public.boards(id) on delete cascade,
   column_id   uuid not null references public.columns(id) on delete restrict,
   team_id     uuid not null references public.teams(id) on delete cascade,
@@ -363,7 +363,7 @@ create policy "Team admins/members can manage task labels"
 -- TASK ACTIVITY LOG
 -- ============================================================
 create table public.task_activity (
-  id         uuid primary key default uuid_generate_v4(),
+  id         uuid primary key default gen_random_uuid(),
   task_id    uuid not null references public.tasks(id) on delete cascade,
   user_id    uuid not null references public.profiles(id) on delete restrict,
   type       text not null, -- 'status_change' | 'assignment' | 'comment' | 'priority_change' | etc.
@@ -400,7 +400,7 @@ create type public.subscription_plan as enum ('lite', 'pro');
 create type public.subscription_status as enum ('active', 'trialing', 'past_due', 'canceled', 'incomplete');
 
 create table public.subscriptions (
-  id                   uuid primary key default uuid_generate_v4(),
+  id                   uuid primary key default gen_random_uuid(),
   team_id              uuid not null references public.teams(id) on delete cascade unique,
   plan                 public.subscription_plan not null default 'lite',
   status               public.subscription_status not null default 'active',
