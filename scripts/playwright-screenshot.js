@@ -11,7 +11,7 @@ const { createClient } = require('@supabase/supabase-js')
 const path = require('path')
 const fs = require('fs')
 
-const SUPABASE_URL = 'http://127.0.0.1:54321'
+const SUPABASE_URL = process.env.SUPABASE_URL || 'http://127.0.0.1:54321'
 const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY
 const APP_URL = 'http://localhost:3000'
 const TEST_EMAIL = 'lam@gmail.com'
