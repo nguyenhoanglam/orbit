@@ -81,11 +81,13 @@ export async function signup(
       : '/onboarding'
 
   const supabase = await createClient()
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? ''
   const { error } = await supabase.auth.signUp({
     email: parsed.data.email,
     password: parsed.data.password,
     options: {
       data: { full_name: parsed.data.displayName },
+      emailRedirectTo: `${appUrl}/auth/callback`,
     },
   })
 
