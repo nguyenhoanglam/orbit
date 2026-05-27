@@ -5,7 +5,18 @@ import { ScreenshotSection } from '@/components/marketing/ScreenshotSection'
 import { FeaturesSection } from '@/components/marketing/FeaturesSection'
 import { PricingSection } from '@/components/marketing/PricingSection'
 
-export default async function LandingPage() {
+export default async function LandingPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ code?: string }>
+}) {
+  // Supabase may land the PKCE code here if emailRedirectTo was not set
+  // correctly — forward it to the proper callback handler.
+  const { code } = await searchParams
+  if (code) {
+    redirect(`/auth/callback?code=${encodeURIComponent(code)}`)
+  }
+
   const supabase = await createClient()
   const {
     data: { user },

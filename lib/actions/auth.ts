@@ -1,6 +1,7 @@
 'use server'
 
 import { redirect } from 'next/navigation'
+import { headers } from 'next/headers'
 import { z } from 'zod'
 import { createClient } from '@/lib/supabase/server'
 
@@ -26,6 +27,17 @@ export interface AuthState {
   errors?: Record<string, string[]>
   message?: string
   success?: boolean
+}
+
+/** Derive the app origin at request time — works without NEXT_PUBLIC_APP_URL. */
+async function getAppUrl(): Promise<string> {
+  if (process.env.NEXT_PUBLIC_APP_URL) return process.env.NEXT_PUBLIC_APP_URL
+  const h = await headers()
+  const origin = h.get('origin')
+  if (origin) return origin
+  const host = h.get('host') ?? 'localhost:3000'
+  const proto = host.startsWith('localhost') ? 'http' : 'https'
+  return `${proto}://${host}`
 }
 
 export async function login(
@@ -81,7 +93,7 @@ export async function signup(
       : '/onboarding'
 
   const supabase = await createClient()
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? ''
+  const appUrl = await getAppUrl()
   const { data, error } = await supabase.auth.signUp({
     email: parsed.data.email,
     password: parsed.data.password,
@@ -120,7 +132,7 @@ export async function loginWithMagicLink(
   const { error } = await supabase.auth.signInWithOtp({
     email: parsed.data.email,
     options: {
-      emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback`,
+      emailRedirectTo: `${await getAppUrl()}/auth/callback`,
     },
   })
 
