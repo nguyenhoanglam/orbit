@@ -13,7 +13,10 @@ const PUBLIC_PATHS = [
 ]
 
 function isPublic(pathname: string) {
-  return PUBLIC_PATHS.some((p) => pathname.startsWith(p))
+  return PUBLIC_PATHS.some((p) =>
+    // '/' must be an exact match — startsWith('/') would match every path
+    p === '/' ? pathname === '/' : pathname.startsWith(p)
+  )
 }
 
 export async function proxy(request: NextRequest) {

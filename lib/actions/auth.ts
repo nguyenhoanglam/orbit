@@ -81,16 +81,26 @@ export async function signup(
       : '/onboarding'
 
   const supabase = await createClient()
-  const { error } = await supabase.auth.signUp({
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? ''
+  const { data, error } = await supabase.auth.signUp({
     email: parsed.data.email,
     password: parsed.data.password,
     options: {
       data: { full_name: parsed.data.displayName },
+      emailRedirectTo: `${appUrl}/auth/callback`,
     },
   })
 
   if (error) {
     return { message: error.message }
+  }
+
+  // Email confirmation required — no session until the user clicks the link
+  if (!data.session) {
+    return {
+      success: true,
+      message: 'Account created! Check your email and click the confirmation link to continue.',
+    }
   }
 
   redirect(next)
