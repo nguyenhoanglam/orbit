@@ -82,7 +82,7 @@ export async function signup(
 
   const supabase = await createClient()
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? ''
-  const { error } = await supabase.auth.signUp({
+  const { data, error } = await supabase.auth.signUp({
     email: parsed.data.email,
     password: parsed.data.password,
     options: {
@@ -93,6 +93,14 @@ export async function signup(
 
   if (error) {
     return { message: error.message }
+  }
+
+  // Email confirmation required — no session until the user clicks the link
+  if (!data.session) {
+    return {
+      success: true,
+      message: 'Account created! Check your email and click the confirmation link to continue.',
+    }
   }
 
   redirect(next)

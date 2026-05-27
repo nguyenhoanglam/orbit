@@ -25,28 +25,32 @@ export default function SignupPage() {
       <CardContent>
         <form action={action} className="space-y-4">
           {state.message && (
-            <p className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive">
+            <p className={`rounded-md px-3 py-2 text-sm ${state.success ? 'bg-green-500/10 text-green-600 dark:text-green-400' : 'bg-destructive/10 text-destructive'}`}>
               {state.message}
             </p>
           )}
-          <div className="space-y-1.5">
-            <Label htmlFor="displayName">Full name</Label>
-            <Input id="displayName" name="displayName" placeholder="Jane Smith" required />
-            <FieldError errors={state.errors?.displayName} />
-          </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="email">Email</Label>
-            <Input id="email" name="email" type="email" placeholder="you@example.com" required />
-            <FieldError errors={state.errors?.email} />
-          </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="password">Password</Label>
-            <Input id="password" name="password" type="password" placeholder="Min. 8 characters" required />
-            <FieldError errors={state.errors?.password} />
-          </div>
-          <Button type="submit" className="w-full" disabled={pending}>
-            {pending ? 'Creating account…' : 'Create account'}
-          </Button>
+          {!state.success && (
+            <>
+              <div className="space-y-1.5">
+                <Label htmlFor="displayName">Full name</Label>
+                <Input id="displayName" name="displayName" placeholder="Jane Smith" required />
+                <FieldError errors={state.errors?.displayName} />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="email">Email</Label>
+                <Input id="email" name="email" type="email" placeholder="you@example.com" required />
+                <FieldError errors={state.errors?.email} />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="password">Password</Label>
+                <Input id="password" name="password" type="password" placeholder="Min. 8 characters" required />
+                <FieldError errors={state.errors?.password} />
+              </div>
+              <Button type="submit" className="w-full" disabled={pending}>
+                {pending ? 'Creating account…' : 'Create account'}
+              </Button>
+            </>
+          )}
         </form>
         <p className="mt-4 text-center text-sm text-muted-foreground">
           Already have an account?{' '}
